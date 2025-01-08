@@ -7,13 +7,15 @@ terraform {
 }
 
 provider "typesense" {
+  key = "sUQKJv6AafWMSWseUyKFtaiY::7d32d883-942e-4baa-ab13-1a22baa0d97d"
 }
 
 resource "typesense_cluster" "example" {
-  memory = "0.5_gb"
-  vcpu = "2_vcpus_1_hr_burst_per_day"
-  region = "oregon"
-  name = "example"
+  memory            = "0.5_gb"
+  vcpu              = "2_vcpus_1_hr_burst_per_day"
+  region            = "oregon"
+  name              = "example"
+  high_availability = "no"
 }
 
 resource "typesense_cluster_api_keys" "example" {

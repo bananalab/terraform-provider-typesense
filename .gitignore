@@ -40,3 +40,4 @@ terraform.rc
 terraform
 
 .idea
+.devcontainer/.aws

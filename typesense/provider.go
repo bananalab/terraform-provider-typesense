@@ -138,6 +138,11 @@ type typesenseProviderModel struct {
 	Key types.String `tfsdk:"key"`
 }
 
+type typesenseHostnamesModel struct {
+	LoadBalanced types.String  `tfsdk:"load_balanced"`
+	Nodes       []types.String `tfsdk:"nodes"`
+}
+
 // typesenseClusterModel maps Typesense cluster schema data.
 type typesenseClusterModel struct {
 	ID                     types.String `tfsdk:"id"`
@@ -152,6 +157,7 @@ type typesenseClusterModel struct {
 	Region                 types.String `tfsdk:"region"`
 	AutoUpgradeCapacity    types.Bool   `tfsdk:"auto_upgrade_capacity"`
 	Status                 types.String `tfsdk:"status"`
+	Hostnames              typesenseHostnamesModel    `tfsdk:"hostnames"`
 }
 
 type typesenseClusterApiKeysModel struct {

@@ -2,20 +2,38 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
+	"terraform-provider-typesense/typesense"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-
-	"terraform-provider-typesense/typesense"
 )
 
 // Provider documentation generation.
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name typesense
-
+/*
 func main() {
 	if err := providerserver.Serve(context.Background(), typesense.New, providerserver.ServeOpts{
 		Address: "omarkhd.net/terraform/typesense",
 	}); err != nil {
+		log.Fatal(err.Error())
+	}
+}
+*/
+func main() {
+	var debug bool
+
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
+
+	opts := providerserver.ServeOpts{
+		Address: "omarkhd.net/terraform/typesense",
+		Debug:   debug,
+	}
+
+	err := providerserver.Serve(context.Background(), typesense.New, opts)
+
+	if err != nil {
 		log.Fatal(err.Error())
 	}
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -105,6 +107,30 @@ var (
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"hostnames": schema.SingleNestedAttribute{
+				Description: "Hostnames for the cluster.",
+				Computed:    true,
+				Attributes: map[string]schema.Attribute{
+					"load_balanced": schema.StringAttribute{
+						Description: "Indicates if load balancing is enabled.",
+						Computed:    true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(), // Handle unknown values
+						},
+					},
+					"nodes": schema.ListAttribute{
+						Description: "List of nodes in the cluster.",
+						ElementType: types.StringType,
+						Computed:    true,
+						PlanModifiers: []planmodifier.List{
+							listplanmodifier.UseStateForUnknown(), // Handle unknown lists
+						},
+					},
+				},
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(), // Handle unknown for the entire nested object
+				},
+			},
 		},
 	}
 )
@@ -178,7 +204,7 @@ func (cr *clusterResource) Create(ctx context.Context, req resource.CreateReques
 			)
 			return
 		}
-		if cluster.Status == "provisioning" {
+		if cluster.Status != "in_service" {
 			continue
 		}
 		break
@@ -197,6 +223,15 @@ func (cr *clusterResource) Create(ctx context.Context, req resource.CreateReques
 	plan.AutoUpgradeCapacity = types.BoolValue(cluster.AutoUpgradeCapacity)
 	plan.Status = types.StringValue(cluster.Status)
 
+	nodes := make([]types.String, len(cluster.Hostnames.Nodes))
+	for i, elem := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(elem)
+	}
+
+	plan.Hostnames = typesenseHostnamesModel{
+		LoadBalanced: types.StringValue(cluster.Hostnames.LoadBalanced),
+		Nodes:        nodes,
+	}
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -289,6 +324,16 @@ func (cr *clusterResource) Update(ctx context.Context, req resource.UpdateReques
 	plan.Region = types.StringValue(cluster.Regions[0])
 	plan.AutoUpgradeCapacity = types.BoolValue(cluster.AutoUpgradeCapacity)
 	plan.Status = types.StringValue(cluster.Status)
+
+	nodes := make([]types.String, len(cluster.Hostnames.Nodes))
+	for i, elem := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(elem)
+	}
+
+	plan.Hostnames = typesenseHostnamesModel{
+		LoadBalanced: types.StringValue(cluster.Hostnames.LoadBalanced),
+		Nodes:        nodes,
+	}
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)

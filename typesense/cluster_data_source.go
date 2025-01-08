@@ -62,6 +62,21 @@ var (
 				Description: "Current status of your cluster.",
 				Computed:    true,
 			},
+			"hostnames": schema.MapNestedAttribute{
+                NestedObject: schema.NestedAttributeObject{
+                    Attributes: map[string]schema.Attribute{
+                        "nodes": schema.ListAttribute{
+                            ElementType: types.StringType,
+                            Computed: true,
+                        },
+                        "load_balanced": schema.SingleNestedAttribute{
+                            Attributes: map[string]schema.Attribute{},
+                            Computed: true,
+                        },
+                    },
+                },
+                Computed: true,
+            },
 		},
 	}
 )

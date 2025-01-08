@@ -23,6 +23,10 @@ type typesenseCluster struct {
 	Regions                []string `json:"regions"`
 	AutoUpgradeCapacity    bool     `json:"auto_upgrade_capacity"`
 	Status                 string   `json:"status"`
+	Hostnames              struct {
+		LoadBalanced string `json:"load_balanced"`
+		Nodes []string `json:"nodes"`
+	} `json:"hostnames"`
 }
 
 type typesenseClusterCreateResponse struct {

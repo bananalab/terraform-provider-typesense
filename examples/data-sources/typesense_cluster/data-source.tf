@@ -1,3 +1,10 @@
+terraform {
+  required_providers {
+    typesense = {
+      source = "omarkhd.net/terraform/typesense"
+    }
+  }
+}
 data "typesense_cluster" "example" {
-  id = "your-id-from-typesense"
+  id = "s89j4uytxnbhomfcp"
 }
