@@ -41,3 +41,5 @@ terraform
 
 .idea
 .devcontainer/.aws
+# Added by goreleaser init:
+dist/
