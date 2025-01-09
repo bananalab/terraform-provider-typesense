@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -140,18 +141,19 @@ type typesenseProviderModel struct {
 
 // typesenseClusterModel maps Typesense cluster schema data.
 type typesenseClusterModel struct {
-	ID                     types.String `tfsdk:"id"`
-	Name                   types.String `tfsdk:"name"`
-	Memory                 types.String `tfsdk:"memory"`
-	VCPU                   types.String `tfsdk:"vcpu"`
-	HighPerformanceDisk    types.String `tfsdk:"high_performance_disk"`
-	TypesenseServerVersion types.String `tfsdk:"typesense_server_version"`
-	HighAvailability       types.String `tfsdk:"high_availability"`
-	SearchDeliveryNetwork  types.String `tfsdk:"search_delivery_network"`
-	LoadBalancing          types.String `tfsdk:"load_balancing"`
-	Region                 types.String `tfsdk:"region"`
-	AutoUpgradeCapacity    types.Bool   `tfsdk:"auto_upgrade_capacity"`
-	Status                 types.String `tfsdk:"status"`
+	ID                     types.String          `tfsdk:"id"`
+	Name                   types.String          `tfsdk:"name"`
+	Memory                 types.String          `tfsdk:"memory"`
+	VCPU                   types.String          `tfsdk:"vcpu"`
+	HighPerformanceDisk    types.String          `tfsdk:"high_performance_disk"`
+	TypesenseServerVersion types.String          `tfsdk:"typesense_server_version"`
+	HighAvailability       types.String          `tfsdk:"high_availability"`
+	SearchDeliveryNetwork  types.String          `tfsdk:"search_delivery_network"`
+	LoadBalancing          types.String          `tfsdk:"load_balancing"`
+	Region                 types.String          `tfsdk:"region"`
+	AutoUpgradeCapacity    types.Bool            `tfsdk:"auto_upgrade_capacity"`
+	Status                 types.String          `tfsdk:"status"`
+	Hostnames              basetypes.ObjectValue `tfsdk:"hostnames"`
 }
 
 type typesenseClusterApiKeysModel struct {

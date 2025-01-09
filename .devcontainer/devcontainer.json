@@ -1,0 +1,24 @@
+{
+  "containerUser": "devcontainer",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.hcl",
+        "hashicorp.terraform",
+        "eamodio.gitlens",
+        "golang.Go",
+        "GitHub.vscode-github-actions"
+      ],
+      "settings": {
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "image": "bananalab/devcontainer:8c5e65b",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    "type=bind,source=/${localEnv:HOME}/.ssh,target=/home/devcontainer/.ssh,readonly",
+    "source=${localWorkspaceFolder}/.devcontainer/.aws,target=/home/devcontainer/.aws,type=bind,consistency=cached"
+  ],
+  "remoteUser": "devcontainer"
+}
