@@ -3,6 +3,7 @@ package typesense
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -62,21 +63,21 @@ var (
 				Description: "Current status of your cluster.",
 				Computed:    true,
 			},
-			"hostnames": schema.MapNestedAttribute{
-                NestedObject: schema.NestedAttributeObject{
-                    Attributes: map[string]schema.Attribute{
-                        "nodes": schema.ListAttribute{
-                            ElementType: types.StringType,
-                            Computed: true,
-                        },
-                        "load_balanced": schema.SingleNestedAttribute{
-                            Attributes: map[string]schema.Attribute{},
-                            Computed: true,
-                        },
-                    },
-                },
-                Computed: true,
-            },
+			"hostnames": schema.SingleNestedAttribute{
+				Description: "Hostnames for the cluster.",
+				Computed:    true,
+				Attributes: map[string]schema.Attribute{
+					"load_balanced": schema.StringAttribute{
+						Description: "Load balancer hostname if load balancing is enabled.",
+						Computed:    true,
+					},
+					"nodes": schema.ListAttribute{
+						Description: "List of nodes in the cluster.",
+						ElementType: types.StringType,
+						Computed:    true,
+					},
+				},
+			},
 		},
 	}
 )
@@ -113,6 +114,17 @@ func (cds *clusterDataSource) Read(ctx context.Context, req datasource.ReadReque
 		)
 		return
 	}
+
+	nodes := make([]attr.Value, len(cluster.Hostnames.Nodes))
+	for i, node := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(node)
+	}
+
+	hostnames := map[string]attr.Value{
+		"load_balanced": types.StringValue(cluster.Hostnames.LoadBalanced),
+		"nodes":         types.ListValueMust(types.StringType, nodes),
+	}
+
 	tcm := &typesenseClusterModel{
 		ID:                     types.StringValue(cluster.ID),
 		Name:                   types.StringValue(cluster.Name),
@@ -126,6 +138,10 @@ func (cds *clusterDataSource) Read(ctx context.Context, req datasource.ReadReque
 		Region:                 types.StringValue(cluster.Regions[0]),
 		AutoUpgradeCapacity:    types.BoolValue(cluster.AutoUpgradeCapacity),
 		Status:                 types.StringValue(cluster.Status),
+		Hostnames: types.ObjectValueMust(map[string]attr.Type{
+			"load_balanced": types.StringType,
+			"nodes":         types.ListType{ElemType: types.StringType},
+		}, hostnames),
 	}
 	// Set state
 	diags = resp.State.Set(ctx, tcm)

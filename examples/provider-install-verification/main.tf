@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     typesense = {
-      source = "omarkhd.net/terraform/typesense"
+      source = "bananalab/terraform/typesense"
     }
   }
 }
@@ -10,7 +10,7 @@ provider "typesense" {
 }
 
 data "typesense_cluster" "example" {
-  id = "05umtgeli2v8b19np"
+  id = "<cluster-id>"
 }
 
 output "example_cluster" {

@@ -34,6 +34,7 @@ var (
 			"admin_key": schema.StringAttribute{
 				Description: "Generated Admin key. Actions [*], Collections [*]",
 				Computed:    true,
+				Sensitive:   true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
@@ -41,6 +42,7 @@ var (
 			"search_only_key": schema.StringAttribute{
 				Description: "Generated Search Only key. Actions [documents:search], Collections [*]",
 				Computed:    true,
+				Sensitive:   true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},

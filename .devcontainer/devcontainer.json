@@ -6,7 +6,8 @@
         "hashicorp.hcl",
         "hashicorp.terraform",
         "eamodio.gitlens",
-        "golang.Go"
+        "golang.Go",
+        "GitHub.vscode-github-actions"
       ],
       "settings": {
         "editor.formatOnSave": true

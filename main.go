@@ -11,15 +11,7 @@ import (
 
 // Provider documentation generation.
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name typesense
-/*
-func main() {
-	if err := providerserver.Serve(context.Background(), typesense.New, providerserver.ServeOpts{
-		Address: "omarkhd.net/terraform/typesense",
-	}); err != nil {
-		log.Fatal(err.Error())
-	}
-}
-*/
+
 func main() {
 	var debug bool
 
@@ -27,7 +19,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "omarkhd.net/terraform/typesense",
+		Address: "bananalab/terraform/typesense",
 		Debug:   debug,
 	}
 

@@ -13,8 +13,16 @@ description: |-
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    typesense = {
+      source = "bananalab/terraform/typesense"
+    }
+  }
+}
+
 data "typesense_cluster" "example" {
-  id = "your-id-from-typesense"
+  id = "<cluster-id>"
 }
 ```
 
@@ -30,6 +38,7 @@ data "typesense_cluster" "example" {
 - `auto_upgrade_capacity` (Boolean) When set to true, your cluster is automatically upgraded when best-practice RAM/CPU thresholds are exceeded in a 12-hour rolling window.
 - `high_availability` (String) When set to yes, cluster is HA and your data is automatically replicated between all nodes.
 - `high_performance_disk` (String) If the hard disk is co-located on the same physical server that runs the node.
+- `hostnames` (Attributes) Hostnames for the cluster. (see [below for nested schema](#nestedatt--hostnames))
 - `load_balancing` (String)
 - `memory` (String) How much RAM this cluster has.
 - `name` (String) A string to identify the cluster for your reference in the Typesense Cloud Web console.
@@ -38,5 +47,13 @@ data "typesense_cluster" "example" {
 - `status` (String) Current status of your cluster.
 - `typesense_server_version` (String) Cluster Typesense server version at creation time.
 - `vcpu` (String) How many CPU cores this cluster has.
+
+<a id="nestedatt--hostnames"></a>
+### Nested Schema for `hostnames`
+
+Read-Only:
+
+- `load_balanced` (String) Load balancer hostname if load balancing is enabled.
+- `nodes` (List of String) List of nodes in the cluster.
 
 

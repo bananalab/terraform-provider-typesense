@@ -24,8 +24,8 @@ type typesenseCluster struct {
 	AutoUpgradeCapacity    bool     `json:"auto_upgrade_capacity"`
 	Status                 string   `json:"status"`
 	Hostnames              struct {
-		LoadBalanced string `json:"load_balanced"`
-		Nodes []string `json:"nodes"`
+		LoadBalanced string   `json:"load_balanced"`
+		Nodes        []string `json:"nodes"`
 	} `json:"hostnames"`
 }
 

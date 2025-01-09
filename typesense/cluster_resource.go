@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -112,10 +113,10 @@ var (
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"load_balanced": schema.StringAttribute{
-						Description: "Indicates if load balancing is enabled.",
+						Description: "Load balancer hostname if load balancing is enabled.",
 						Computed:    true,
 						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(), // Handle unknown values
+							stringplanmodifier.UseStateForUnknown(),
 						},
 					},
 					"nodes": schema.ListAttribute{
@@ -123,12 +124,12 @@ var (
 						ElementType: types.StringType,
 						Computed:    true,
 						PlanModifiers: []planmodifier.List{
-							listplanmodifier.UseStateForUnknown(), // Handle unknown lists
+							listplanmodifier.UseStateForUnknown(),
 						},
 					},
 				},
 				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(), // Handle unknown for the entire nested object
+					objectplanmodifier.UseStateForUnknown(),
 				},
 			},
 		},
@@ -223,15 +224,21 @@ func (cr *clusterResource) Create(ctx context.Context, req resource.CreateReques
 	plan.AutoUpgradeCapacity = types.BoolValue(cluster.AutoUpgradeCapacity)
 	plan.Status = types.StringValue(cluster.Status)
 
-	nodes := make([]types.String, len(cluster.Hostnames.Nodes))
-	for i, elem := range cluster.Hostnames.Nodes {
-		nodes[i] = types.StringValue(elem)
+	nodes := make([]attr.Value, len(cluster.Hostnames.Nodes))
+	for i, node := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(node)
 	}
 
-	plan.Hostnames = typesenseHostnamesModel{
-		LoadBalanced: types.StringValue(cluster.Hostnames.LoadBalanced),
-		Nodes:        nodes,
+	hostnames := map[string]attr.Value{
+		"load_balanced": types.StringValue(cluster.Hostnames.LoadBalanced),
+		"nodes":         types.ListValueMust(types.StringType, nodes),
 	}
+
+	plan.Hostnames = types.ObjectValueMust(map[string]attr.Type{
+		"load_balanced": types.StringType,
+		"nodes":         types.ListType{ElemType: types.StringType},
+	}, hostnames)
+
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -271,6 +278,21 @@ func (cr *clusterResource) Read(ctx context.Context, req resource.ReadRequest, r
 	state.Region = types.StringValue(cluster.Regions[0])
 	state.AutoUpgradeCapacity = types.BoolValue(cluster.AutoUpgradeCapacity)
 	state.Status = types.StringValue(cluster.Status)
+
+	nodes := make([]attr.Value, len(cluster.Hostnames.Nodes))
+	for i, node := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(node)
+	}
+
+	hostnames := map[string]attr.Value{
+		"load_balanced": types.StringValue(cluster.Hostnames.LoadBalanced),
+		"nodes":         types.ListValueMust(types.StringType, nodes),
+	}
+
+	state.Hostnames = types.ObjectValueMust(map[string]attr.Type{
+		"load_balanced": types.StringType,
+		"nodes":         types.ListType{ElemType: types.StringType},
+	}, hostnames)
 
 	// Set refreshed state
 	diags = resp.State.Set(ctx, &state)
@@ -325,15 +347,20 @@ func (cr *clusterResource) Update(ctx context.Context, req resource.UpdateReques
 	plan.AutoUpgradeCapacity = types.BoolValue(cluster.AutoUpgradeCapacity)
 	plan.Status = types.StringValue(cluster.Status)
 
-	nodes := make([]types.String, len(cluster.Hostnames.Nodes))
-	for i, elem := range cluster.Hostnames.Nodes {
-		nodes[i] = types.StringValue(elem)
+	nodes := make([]attr.Value, len(cluster.Hostnames.Nodes))
+	for i, node := range cluster.Hostnames.Nodes {
+		nodes[i] = types.StringValue(node)
 	}
 
-	plan.Hostnames = typesenseHostnamesModel{
-		LoadBalanced: types.StringValue(cluster.Hostnames.LoadBalanced),
-		Nodes:        nodes,
+	hostnames := map[string]attr.Value{
+		"load_balanced": types.StringValue(cluster.Hostnames.LoadBalanced),
+		"nodes":         types.ListValueMust(types.StringType, nodes),
 	}
+
+	plan.Hostnames = types.ObjectValueMust(map[string]attr.Type{
+		"load_balanced": types.StringType,
+		"nodes":         types.ListType{ElemType: types.StringType},
+	}, hostnames)
 
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
